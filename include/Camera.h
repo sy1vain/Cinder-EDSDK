@@ -96,6 +96,14 @@ public:
     void toggleLiveView();
     void requestLiveViewImage(const std::function<void(EdsError error, ci::SurfaceRef surface)>& callback);
 
+	inline bool isRecording() const {
+		return mIsRecording;
+	};
+	EdsError requestStartRecording();
+	EdsError requestStopRecording();
+	void toggleRecording();
+
+
 private:
     Camera(const EdsCameraRef& camera);
 
@@ -110,6 +118,7 @@ private:
     bool mHasOpenSession;
     bool mShouldKeepAlive;
     bool mIsLiveViewActive;
+	bool mIsRecording;
 };
 
 }}

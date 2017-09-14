@@ -49,7 +49,7 @@ CameraRef Camera::create(const EdsCameraRef& camera) {
     return CameraRef(new Camera(camera))->shared_from_this();
 }
 
-Camera::Camera(const EdsCameraRef& camera) : mHasOpenSession(false), mIsLiveViewActive(false) {
+Camera::Camera(const EdsCameraRef& camera) : mHasOpenSession(false), mIsLiveViewActive(false), mIsRecording(false) {
     if (!camera) {
         throw Exception();
     }
@@ -376,6 +376,60 @@ cleanup:
     }
 
     callback(error, surface);
+}
+
+EdsError Camera::requestStartRecording() {
+	if (!mHasOpenSession) {
+		return EDS_ERR_SESSION_NOT_OPEN;
+	}
+	if (mIsRecording) {
+		return EDS_ERR_INTERNAL_ERROR;
+	}
+
+	//set save to camera active
+	EdsUInt32 saveTo = kEdsSaveTo_Camera;
+	EdsError error = EdsSetPropertyData(mCamera, kEdsPropID_SaveTo, 0, sizeof(saveTo), &saveTo);
+	if (error != EDS_ERR_OK) {
+		CI_LOG_E("failed to set destination") << error;
+		return error;
+	}
+
+	EdsUInt32 record_start = 4; // Begin movie shooting
+	error = EdsSetPropertyData(mCamera, kEdsPropID_Record, 0, sizeof(record_start), &record_start);
+
+	if (error != EDS_ERR_OK) {
+		CI_LOG_E("failed to start recording movie:") << error << " " << EDS_ERR_DEVICE_BUSY;
+	}
+
+	mIsRecording = true;
+
+	return EDS_ERR_OK;
+}
+
+EdsError Camera::requestStopRecording() {
+	if (!mIsRecording) {
+		return EDS_ERR_INTERNAL_ERROR;
+	}
+
+	EdsUInt32 record_start = 0; // Begin movie shooting
+	EdsError error = EdsSetPropertyData(mCamera, kEdsPropID_Record, 0, sizeof(record_start), &record_start);
+
+	if (error != EDS_ERR_OK) {
+		CI_LOG_E("failed to stop recording movie") << error;
+	}
+
+	mIsRecording = false;
+
+	return EDS_ERR_OK;
+}
+
+void Camera::toggleRecording() {
+	if (mIsRecording) {
+		requestStopRecording();
+	}
+	else {
+		requestStartRecording();
+	}
 }
 
 #pragma mark - CALLBACKS

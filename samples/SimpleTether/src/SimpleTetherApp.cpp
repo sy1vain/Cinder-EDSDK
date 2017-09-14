@@ -48,6 +48,11 @@ void SimpleTetherApp::keyDown(KeyEvent event) {
                 mCamera->requestTakePicture();
             }
             break;
+		case app::KeyEvent::KEY_r:
+			if (mCamera && mCamera->hasOpenSession()) {
+				mCamera->toggleRecording();
+			}
+			break;
         case app::KeyEvent::KEY_ESCAPE:
             quit();
             break;
