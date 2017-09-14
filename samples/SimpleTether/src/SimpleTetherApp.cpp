@@ -1,5 +1,6 @@
 
 #include "cinder/app/App.h"
+#include "cinder/Utilities.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
 
@@ -22,6 +23,7 @@ public:
     void browserDidEnumerateCameras();
 
     void didRemoveCamera(CameraRef camera);
+	void didRequestTransfer(CameraRef camera, CameraFileRef file);
     void didAddFile(CameraRef camera, CameraFileRef file);
 
 private:
@@ -62,6 +64,7 @@ void SimpleTetherApp::keyDown(KeyEvent event) {
 }
 
 void SimpleTetherApp::update() {
+	return;
     if (mCamera && mCamera->hasOpenSession() && mCamera->isLiveViewActive()) {
         mCamera->requestLiveViewImage([&](EdsError error, ci::SurfaceRef surface) {
             if (error == EDS_ERR_OK) {
@@ -91,6 +94,7 @@ void SimpleTetherApp::browserDidAddCamera(CameraRef camera) {
 
     mCamera = camera;
     mCamera->connectRemovedHandler(&SimpleTetherApp::didRemoveCamera, this);
+	mCamera->connectTransferRequestHandler(&SimpleTetherApp::didRequestTransfer, this);
     mCamera->connectFileAddedHandler(&SimpleTetherApp::didAddFile, this);
     console() << "grabbing camera: " << camera->getName() << std::endl;
 
@@ -131,13 +135,16 @@ void SimpleTetherApp::didRemoveCamera(CameraRef camera) {
 }
 
 void SimpleTetherApp::didAddFile(CameraRef camera, CameraFileRef file) {
-//    fs::path destinationFolderPath = expandPath(fs::path("~/Desktop/Captures"));
-//    camera->requestDownloadFile(file, destinationFolderPath, [&](EdsError error, ci::fs::path outputFilePath) {
-//        if (error == EDS_ERR_OK) {
-//            console() << "image downloaded to '" << outputFilePath << "'" << std::endl;
-//        }
-//    });
+	if (file->isFolder()) return;
+	fs::path destinationFolderPath = getDocumentsDirectory() / "Captures";
+    camera->requestDownloadFile(file, destinationFolderPath, [&](EdsError error, ci::fs::path outputFilePath) {
+        if (error == EDS_ERR_OK) {
+            console() << "image downloaded to '" << outputFilePath << "'" << std::endl;
+        }
+    });
+}
 
+void SimpleTetherApp::didRequestTransfer(CameraRef camera, CameraFileRef file) {
     camera->requestReadFile(file, [&](EdsError error, ci::SurfaceRef surface) {
         if (error == EDS_ERR_OK) {
             mPhotoTexture = gl::Texture::create(*surface);

@@ -101,6 +101,10 @@ void Camera::connectRemovedHandler(const std::function<void(CameraRef)>& handler
     mRemovedHandler = handler;
 }
 
+void Camera::connectTransferRequestHandler(const std::function<void(CameraRef, CameraFileRef)>& handler) {
+	mTransferRequestHandler = handler;
+}
+
 void Camera::connectFileAddedHandler(const std::function<void(CameraRef, CameraFileRef)>& handler) {
     mFileAddedHandler = handler;
 }
@@ -160,7 +164,7 @@ EdsError Camera::requestTakePicture() {
 
     EdsError error = EdsSendCommand(mCamera, kEdsCameraCommand_TakePicture, 0);
     if (error != EDS_ERR_OK) {
-        CI_LOG_E("failed to take picture");
+        CI_LOG_E("failed to take picture: ") << error;
     }
     return error;
 }
@@ -180,7 +184,7 @@ void Camera::requestDownloadFile(const CameraFileRef& file, const fs::path& dest
     EdsStreamRef stream = NULL;
     EdsError error = EdsCreateFileStream(filePath.generic_string().c_str(), kEdsFileCreateDisposition_CreateAlways, kEdsAccess_ReadWrite, &stream);
     if (error != EDS_ERR_OK) {
-        CI_LOG_E("failed to create file stream");
+        CI_LOG_E("failed to create file stream: ") << error;;
         goto download_cleanup;
     }
 
@@ -192,7 +196,7 @@ void Camera::requestDownloadFile(const CameraFileRef& file, const fs::path& dest
 
     error = EdsDownloadComplete(file->mDirectoryItem);
     if (error != EDS_ERR_OK) {
-        CI_LOG_E("failed to mark download as complete");
+        CI_LOG_E("failed to mark download as complete: ") << error;;
         goto download_cleanup;
     }
 
@@ -435,6 +439,7 @@ void Camera::toggleRecording() {
 #pragma mark - CALLBACKS
 
 EdsError EDSCALLBACK Camera::handleObjectEvent(EdsUInt32 event, EdsBaseRef ref, EdsVoid* context) {
+	CI_LOG_D(event);
     Camera* c = (Camera*)context;
     CameraRef camera = CameraBrowser::instance()->cameraForPortName(c->getPortName());
     switch (event) {
@@ -449,11 +454,28 @@ EdsError EDSCALLBACK Camera::handleObjectEvent(EdsUInt32 event, EdsBaseRef ref, 
             }
             EdsRelease(directoryItem);
             directoryItem = NULL;
-            if (camera->mFileAddedHandler) {
-                camera->mFileAddedHandler(camera, file);
+            if (camera->mTransferRequestHandler) {
+                camera->mTransferRequestHandler(camera, file);
             }
             break;
         }
+		case kEdsObjectEvent_DirItemCreated: {
+			EdsDirectoryItemRef directoryItem = (EdsDirectoryItemRef)ref;
+			CameraFileRef file = nullptr;
+			try {
+				file = CameraFile::create(directoryItem);
+			}
+			catch (...) {
+				EdsRelease(directoryItem);
+				break;
+			}
+			EdsRelease(directoryItem);
+			directoryItem = NULL;
+			if (camera->mFileAddedHandler) {
+				camera->mFileAddedHandler(camera, file);
+			}
+			break;
+		}
         default:
             if (ref) {
                 EdsRelease(ref);

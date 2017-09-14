@@ -22,6 +22,9 @@ public:
     static CameraFileRef create(const EdsDirectoryItemRef& directoryItem);
     ~CameraFile();
 
+	inline bool isFolder() const {
+		return mDirectoryItemInfo.isFolder == TRUE;
+	}
     inline std::string getName() const {
         return std::string(mDirectoryItemInfo.szFileName);
     }
@@ -67,7 +70,10 @@ public:
     template<typename T, typename Y>
     inline void connectRemovedHandler(T handler, Y* obj) { connectRemovedHandler(std::bind(handler, obj, std::placeholders::_1)); }
     void connectRemovedHandler(const std::function<void(CameraRef)>& handler);
-    template<typename T, typename Y>
+	template<typename T, typename Y>
+	inline void connectTransferRequestHandler(T handler, Y* obj) { connectTransferRequestHandler(std::bind(handler, obj, std::placeholders::_1, std::placeholders::_2)); }
+	void connectTransferRequestHandler(const std::function<void(CameraRef, CameraFileRef)>& handler);
+	template<typename T, typename Y>
     inline void connectFileAddedHandler(T handler, Y* obj) { connectFileAddedHandler(std::bind(handler, obj, std::placeholders::_1, std::placeholders::_2)); }
     void connectFileAddedHandler(const std::function<void(CameraRef, CameraFileRef)>& handler);
 
@@ -112,7 +118,8 @@ private:
     static EdsError EDSCALLBACK handleStateEvent(EdsUInt32 event, EdsUInt32 param, EdsVoid* context);
 
     std::function<void (CameraRef)> mRemovedHandler;
-    std::function<void (CameraRef, CameraFileRef)> mFileAddedHandler;
+    std::function<void (CameraRef, CameraFileRef)> mTransferRequestHandler;
+	std::function<void(CameraRef, CameraFileRef)> mFileAddedHandler;
     EdsCameraRef mCamera;
     EdsDeviceInfo mDeviceInfo;
     bool mHasOpenSession;
