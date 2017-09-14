@@ -10,6 +10,7 @@
 #include "CameraBrowser.h"
 
 #include "cinder/Log.h"
+#include "cinder/app/AppBase.h"
 
 using namespace ci;
 using namespace ci::app;
@@ -233,7 +234,7 @@ void Camera::requestReadFile(const CameraFileRef& file, const std::function<void
         goto read_cleanup;
     }
 
-    EdsUInt32 length;
+    EdsUInt64 length;
     error = EdsGetLength(stream, &length);
     if (error != EDS_ERR_OK) {
         CI_LOG_E("failed to get stream length");
@@ -346,7 +347,7 @@ void Camera::requestLiveViewImage(const std::function<void(EdsError error, Surfa
         goto cleanup;
     }
 
-    EdsUInt32 length;
+    EdsUInt64 length;
     error = EdsGetLength(stream, &length);
     if (error != EDS_ERR_OK) {
         CI_LOG_E("failed to get Evf image length");

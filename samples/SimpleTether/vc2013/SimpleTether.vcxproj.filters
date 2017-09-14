@@ -12,6 +12,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
     </Filter>
+    <Filter Include="blocks">
+      <UniqueIdentifier>{4f9cc75d-118c-4163-8d90-b8fb858a83e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="blocks\EDSDK">
+      <UniqueIdentifier>{72186954-c1cb-4ff5-9a07-db3b903b4dbd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\SimpleTetherApp.cpp">
@@ -23,10 +29,25 @@
     <ClInclude Include="..\include\Resources.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClCompile Include="..\..\..\src\Camera.cpp">
+      <Filter>blocks\EDSDK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\CameraBrowser.cpp">
+      <Filter>blocks\EDSDK</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\Resources.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Camera.h">
+      <Filter>blocks\EDSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\CameraBrowser.h">
+      <Filter>blocks\EDSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Cinder-EDSDK.h">
+      <Filter>blocks\EDSDK</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -9,6 +9,7 @@
 #pragma once
 
 #include "Camera.h"
+#include <boost/core/noncopyable.hpp>
 
 namespace Cinder { namespace EDSDK {
 

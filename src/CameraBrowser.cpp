@@ -9,6 +9,7 @@
 #include "CameraBrowser.h"
 
 #include "cinder/Log.h"
+#include "cinder/app/AppBase.h"
 #include "cinder/Utilities.h"
 
 using namespace ci;

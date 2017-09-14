@@ -8,14 +8,6 @@
 
 #pragma once
 
-#if defined(CINDER_MAC)
-    #define __MACOS__
-#elif defined(CINDER_MSW) || defined(CINDER_WINRT)
-    #error Target platform unsupported by Cinder-EDSDK
-#else
-    #error Target platform unsupported by EDSDK
-#endif
-
 #include "EDSDK.h"
 #include "cinder/Cinder.h"
 #include "cinder/ImageIo.h"
