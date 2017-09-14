@@ -2,15 +2,16 @@
 <cinder>
 <block
     name="Canon EDSDK"
-    id="com.chordedconstructions.fleshworld.cinder-edsdk"
-    git="https://github.com/pizthewiz/Cinder-EDSDK.git"
-    author="Jean-Pierre Mouilleseaux"
+    id="nl.sylvain.cinder.edsdk"
+    git="https://github.com/sy1vain/Cinder-EDSDK.git"
+    author="Sylvain Vriens"
     summary="Canon camera control"
-    version="2.15"
-    url="https://github.com/pizthewiz/Cinder-EDSDK"
+    version="3.0"
+    url="https://github.com/sy1vain/Cinder-EDSDK"
     library="http://www.usa.canon.com/cusa/consumer/standard_display/sdk_homepage"
     >
     <supports os="macosx" />
+    <supports os="msw" />
     <headerPattern>include/*.h</headerPattern>
     <sourcePattern>src/*.cpp</sourcePattern>
     <headerPattern>lib/EDSDK/Header/*.h</headerPattern>
@@ -18,6 +19,10 @@
         <framework>lib/EDSDK/Framework/EDSDK.framework</framework>
         <buildcopy destination="Frameworks">lib/EDSDK/Framework/EDSDK.framework</buildcopy>
         <frameworkPath>lib/EDSDK/Framework</frameworkPath>
+    </platform>
+    <platform os="msw">
+      <staticLibrary>lib/EDSDK/Library/EDSDK.lib</staticLibrary>
+      <buildCopy>lib/EDSDK/Dll/EDSDK.dll</buildCopy>m
     </platform>
     <copyExclude>samples</copyExclude>
 </block>
